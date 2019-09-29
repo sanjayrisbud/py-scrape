@@ -16,7 +16,7 @@ class TestRobot(RawRequests):
     def run(self):
         print(self.tt.row(header=True))
         self.tt.FetchDate = self.date()
-        self.tt.Id = 135
+        self.tt.StockId = 135
         self.tt.Symbol = "ALI"
         self.tt.Description = "Ayala Land Inc"
         self.tt.Price = 51.75
@@ -30,14 +30,14 @@ class TestRobot(RawRequests):
         self.tt.set_private_fields()
         print(self.tt.row(storable_only=True, with_private_fields=True))
         self.csv.writerow(self.tt.row(storable_only=True, with_private_fields=True))
-        self.tt.Id = 76
+        self.tt.StockId = 76
         self.tt.Symbol = "JFC"
         self.tt.Description = "Jollibee Foods Corporation"
         self.tt.Price = 228.0
         self.tt.set_private_fields()
         print(self.tt.row(storable_only=True, with_private_fields=True))
         self.csv.writerow(self.tt.row(storable_only=True, with_private_fields=True))
-        self.tt.Id = 432
+        self.tt.StockId = 432
         self.tt.set_private_fields()
         print(self.tt.row(storable_only=True, with_private_fields=True))
         self.csv.writerow(self.tt.row(storable_only=True, with_private_fields=True))
