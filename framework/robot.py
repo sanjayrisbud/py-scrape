@@ -11,23 +11,23 @@ from time import sleep
 from datetime import datetime
 
 from common.generic_input import GenericInput
-
+from .db_factory import DatabaseFactory
 
 class Robot:
     _robotname = None
     _executionid = None
-    _database = None
+    _database = DatabaseFactory.getdb("odbc-postgres")
     _email = None
     logger = None
     GenericInput = None
 
     def __init__(self, args):
-        self._robotname = args[0].replace("/", " ").replace("\\", " ").split()[-1][:-3]
+        self._robotname = args[0].replace("/", " ").replace("\\", " ").split()[-1]
         self.GenericInput = GenericInput()
         self.parse_input(args)
-        self._executionid = hash(self.now()) + hash(self.GenericInput)
+        self._executionid = str(hash(self.now()) + hash(self.GenericInput))
         self.init_loggers()
-        self.logger.debug("{} {}".format(self._robotname, self._executionid))
+        self.logger.debug(f"Robot: {self._robotname} Id: {self._executionid}")
 
     def init_loggers(self):
         self.logger = logging.getLogger(__name__)
@@ -41,6 +41,8 @@ class Robot:
         stream_handler.setLevel(logging.DEBUG)
         stream_handler.setFormatter(logging.Formatter("%(asctime)s %(message)s"))
         self.logger.addHandler(stream_handler)
+        self.logger.info(f"Log created at {self.now()} for input {self.GenericInput.longText1}")
+        self._database.set_logger(self.logger)
 
     def now(self):
         return datetime.today()
