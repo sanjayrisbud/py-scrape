@@ -27,7 +27,7 @@ class DatabaseType(Type):
 
     def computekey(self):
         s = str([f["value"] for f in self._fields if f["part_of_key"]])
-        return hashlib.md5(s.encode('utf-8')).hexdigest()
+        return hashlib.md5(s.encode("utf-8")).hexdigest()
 
     def set_private_fields(self):
         self.__objectkey = self.computekey()
@@ -37,9 +37,56 @@ class DatabaseType(Type):
         row = []
         if with_private_fields:
             if header:
-                row = ["ObjectKey", "RobotName", "ExecutionId", "FirstExtracted", "LastExtracted"]
+                row = [
+                    "ObjectKey",
+                    "RobotName",
+                    "ExecutionId",
+                    "FirstExtracted",
+                    "LastExtracted",
+                ]
             else:
-                row = [self.__objectkey, self.__robotname, self.__executionid, self.__firstextracted, self.__lastextracted]
+                row = [
+                    self.__objectkey,
+                    self.__robotname,
+                    self.__executionid,
+                    self.__firstextracted,
+                    self.__lastextracted,
+                ]
         row.extend(super().row(header, storable_only))
         return row
 
+    def get_create_script(self):
+        s = f"CREATE TABLE {self.__class__.__name__} "
+        s += """(
+            ObjectKey <objkey>,
+            RobotName <rname>,
+            ExecutionId <exid>,
+            FirstExtracted <datetime>,
+            LastExtracted <datetime>,
+            <cols>
+            CONSTRAINT pk_ObjKey PRIMARY KEY (ObjectKey)
+        )"""
+        cols = ""
+        for f in self._fields:
+            if f["storable"]:
+                cols += "{} <{}>, ".format(f["name"], f["type"])
+        s = s.replace("<cols>", cols)
+        return s
+
+    def get_insert_clause(self):
+        query = ""
+        fields = self.row(header=True, storable_only=True, with_private_fields=True)
+        values = self.row(header=False, storable_only=True, with_private_fields=True)
+        row_dict = dict(zip(fields, values))
+        fields = []
+        values = []
+        for k, v in row_dict.items():
+            if v:
+                fields.append(k)
+                values.append(v)
+        query = "INSERT INTO {}{} VALUES{}".format(
+            self.__class__.__name__,
+            str(tuple(fields)).replace("'", ""),
+            str(tuple(["?" for _ in fields])).replace("'", ""),
+        )
+        return query, tuple(values)
