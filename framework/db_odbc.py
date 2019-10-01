@@ -10,7 +10,7 @@ class DatabaseInterfaceOdbc(DatabaseInterface):
         super().__init__(logger)
         self._conn = pyodbc.connect(f"DSN={dsn}", autocommit=True)
 
-    def execute(self, script, params=None, return_rs=False):
+    def execute(self, script, params=None, returnrs=False, fetchone=False):
         if self._logger:
             self._logger.debug(f"script: {script}")
         cursor = self._conn.cursor()
@@ -20,11 +20,14 @@ class DatabaseInterfaceOdbc(DatabaseInterface):
         else:
             rs = cursor.execute(script)
 
-        if return_rs:
+        if fetchone:
+            return rs.fetchone() is not None
+
+        if returnrs:
             return rs
 
     def query(self, script, params=None):
-        rs = self.execute(script, params, return_rs=True)
+        rs = self.execute(script, params, returnrs=True)
         l = []
         cols = [e[0] for e in rs.description]
         for row in rs:
@@ -33,14 +36,20 @@ class DatabaseInterfaceOdbc(DatabaseInterface):
         return l
 
     def find(self, dbtype):
-        pass
+        dbtype.set_private_fields()
+        script, params = dbtype.get_select_clause()
+        return self.execute(script, params, fetchone=True)
 
     def delete(self, dbtype):
-        pass
+        dbtype.set_private_fields()
+        script, params = dbtype.get_delete_clause()
+        self.execute(script, params)
 
     def store(self, dbtype):
-        dbtype.set_private_fields()
-        script, params = dbtype.get_insert_clause()
+        if self.find(dbtype):
+            script, params = dbtype.get_update_clause()
+        else:
+            script, params = dbtype.get_insert_clause()
         self.execute(script, params)
 
 

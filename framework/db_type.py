@@ -9,6 +9,8 @@
 
 import hashlib
 from datetime import datetime
+from typing import List
+
 from .type import Type
 
 
@@ -73,6 +75,14 @@ class DatabaseType(Type):
         s = s.replace("<cols>", cols)
         return s
 
+    def get_select_clause(self):
+        query = f"SELECT ObjectKey FROM {self.__class__.__name__} WHERE ObjectKey = ?"
+        return query, (self.__objectkey)
+
+    def get_delete_clause(self):
+        query = f"DELETE FROM {self.__class__.__name__} WHERE ObjectKey = ?"
+        return query, (self.__objectkey)
+
     def get_insert_clause(self):
         query = ""
         fields = self.row(header=True, storable_only=True, with_private_fields=True)
@@ -90,3 +100,25 @@ class DatabaseType(Type):
             str(tuple(["?" for _ in fields])).replace("'", ""),
         )
         return query, tuple(values)
+
+    def get_update_clause(self):
+        query = ""
+        fields = self.row(header=True, storable_only=True, with_private_fields=False)
+        values = self.row(header=False, storable_only=True, with_private_fields=False)
+        row_dict = dict(zip(fields, values))
+        fields = []
+        values = []
+        fields.append("LastExtracted = ?")
+        values.append(self.__lastextracted)
+        for k, v in row_dict.items():
+            if v:
+                fields.append(f"{k} = ?")
+                values.append(v)
+            else:
+                fields.append(f"{k} = NULL")
+        values.append(self.__objectkey)
+        query = "UPDATE {} SET {} WHERE ObjectKey = ?".format(
+            self.__class__.__name__, str(fields).replace("'", "").strip("[]")
+        )
+        return query, tuple(values)
+
