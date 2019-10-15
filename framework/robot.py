@@ -12,7 +12,7 @@ from datetime import datetime
 
 from common.generic_input import GenericInput
 from .db_factory import DatabaseFactory
-
+from .email_int import EmailInterface
 class Robot:
     _robotname = None
     _executionid = None
@@ -24,6 +24,7 @@ class Robot:
     def __init__(self, args):
         self._robotname = args[0].replace("/", " ").replace("\\", " ").split()[-1]
         self.GenericInput = GenericInput()
+        self._email = EmailInterface()
         self.parse_input(args)
         self._executionid = str(hash(self.now()) + hash(self.GenericInput))
         self.init_loggers()
@@ -43,6 +44,7 @@ class Robot:
         self.logger.addHandler(stream_handler)
         self.logger.info(f"Log created at {self.now()} for input {self.GenericInput.longText1}")
         self._database.set_logger(self.logger)
+        self._email.set_logger(self.logger)
 
     def now(self):
         return datetime.today()
