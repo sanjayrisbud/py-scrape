@@ -13,6 +13,8 @@ from datetime import datetime
 from common.generic_input import GenericInput
 from .db_factory import DatabaseFactory
 from .email_int import EmailInterface
+
+
 class Robot:
     _robotname = None
     _executionid = None
@@ -34,7 +36,9 @@ class Robot:
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.DEBUG)
         file_handler = logging.FileHandler(
-            f"{sys.path[0]}{os.sep}logs{os.sep}{self._robotname}_{self._executionid}.log", encoding="utf-8")
+            f"{sys.path[0]}{os.sep}logs{os.sep}{self._robotname}_{self._executionid}.log",
+            encoding="utf-8",
+        )
         file_handler.setFormatter(logging.Formatter("%(asctime)s %(message)s"))
         file_handler.setLevel(logging.INFO)
         self.logger.addHandler(file_handler)
@@ -42,7 +46,9 @@ class Robot:
         stream_handler.setLevel(logging.DEBUG)
         stream_handler.setFormatter(logging.Formatter("%(asctime)s %(message)s"))
         self.logger.addHandler(stream_handler)
-        self.logger.info(f"Log created at {self.now()} for input {self.GenericInput.longText1}")
+        self.logger.info(
+            f"Log created at {self.now()} for input {self.GenericInput.longText1}"
+        )
         self._database.set_logger(self.logger)
         self._email.set_logger(self.logger)
 
@@ -57,6 +63,9 @@ class Robot:
         t = random.uniform(min, max)
         self.logger.debug(f"Sleeping for {t} seconds")
         sleep(t)
+
+    def changedb(self, name):
+        self._database = DatabaseFactory.getdb(name, self.logger)
 
     def parse_input(self, args):
         if len(args) == 1:
