@@ -12,9 +12,6 @@ class DatabaseInterface:
     def set_logger(self, logger):
         self._logger = logger
 
-    def execute(self, script, params=None, returnrs=False, fetchone=False):
-        raise NotImplementedError
-
     def query(self, script, params=None):
         raise NotImplementedError
 
