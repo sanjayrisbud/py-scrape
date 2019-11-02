@@ -85,9 +85,7 @@ class DatabaseType(Type):
 
     def get_insert_clause(self):
         query = ""
-        fields = self.row(header=True, storable_only=True, with_private_fields=True)
-        values = self.row(header=False, storable_only=True, with_private_fields=True)
-        row_dict = dict(zip(fields, values))
+        row_dict = self.get_fields_and_values("insert")
         fields = []
         values = []
         for k, v in row_dict.items():
@@ -103,9 +101,7 @@ class DatabaseType(Type):
 
     def get_update_clause(self):
         query = ""
-        fields = self.row(header=True, storable_only=True, with_private_fields=False)
-        values = self.row(header=False, storable_only=True, with_private_fields=False)
-        row_dict = dict(zip(fields, values))
+        row_dict = self.get_fields_and_values("update")
         fields = []
         values = []
         fields.append("LastExtracted = ?")
@@ -121,4 +117,13 @@ class DatabaseType(Type):
             self.__class__.__name__, str(fields).replace("'", "").strip("[]")
         )
         return query, tuple(values)
+
+    def get_fields_and_values(self, script):
+        if script == "insert":
+            wpf = True
+        else:
+            wpf = False
+        fields = self.row(header=True, storable_only=True, with_private_fields=wpf)
+        values = self.row(header=False, storable_only=True, with_private_fields=wpf)
+        return dict(zip(fields, values))
 
