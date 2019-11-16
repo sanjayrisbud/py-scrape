@@ -4,3 +4,4 @@ lxml
 pyodbc
 pymongo
 dnspython
+shadow-useragent
