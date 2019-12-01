@@ -22,6 +22,8 @@ class RawRequests(Robot):
         "178.128.85.255:3128",
         "202.162.211.46:30161",
     ]
+    use_proxies = True
+    use_random_agents = True
 
     def __init__(self, args):
         super(RawRequests, self).__init__(args)
@@ -41,13 +43,23 @@ class RawRequests(Robot):
         kwargs.update({"timeout": timeout})
 
         headers = kwargs.get("headers", {})
-        headers.update({"User-Agent": ShadowUserAgent().random_nomobile})
+        if self.use_random_agents:
+            headers.update({"User-Agent": ShadowUserAgent().random_nomobile})
+        else:
+            headers.update(
+                {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) " +
+                                    "AppleWebKit/537.36 (KHTML, like Gecko) " +
+                                    "Chrome/78.0.3904.97 Safari/537.36 OPR/65.0.3467.48"
+                }
+            )
         kwargs.update({"headers": headers})
 
-        proxy = random.choice(self._proxypool)
-        kwargs["proxies"] = {"http": proxy, "https": proxy}
+        if self.use_proxies:
+            proxy = random.choice(self._proxypool)
+            kwargs["proxies"] = {"http": proxy, "https": proxy}
+            self.logger.debug(f"Using proxy {proxy}")
 
-        self.logger.debug(f"Using proxy {proxy}")
         r = self._session.request(method, url, **kwargs)
         self.logger.debug(r.request.headers)
         return r
