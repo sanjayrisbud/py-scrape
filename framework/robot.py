@@ -98,10 +98,29 @@ class Robot:
 
     def execute(self):
         try:
+            self.notify("START")
             self.run()
             self.finalize()
+            self.notify("END")
         except Exception as e:
             self.logger.exception(e)
+
+    def notify(self, phase):
+        task = "Main"
+        if self.GenericInput.longText1 != "":
+            task = f"Task {self.GenericInput.longText1}"
+        html = f"""\
+        <html>
+        <body>
+            <h1>Robot {phase}</h1>
+            <p>{task}</p>
+            <p>{self.now()}</p>
+        </body>
+        </html>
+        """
+        self._email.set_recipients("sanj19972001@yahoo.com")
+        self._email.set_message(self._robotname, html)
+        self._email.send()
 
     def run(self):
         raise NotImplementedError
