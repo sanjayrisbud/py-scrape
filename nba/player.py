@@ -5,6 +5,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from framework.db_type import DatabaseType
 from framework.db_factory import DatabaseFactory
 
+
 class Player(DatabaseType):
 
     def __init__(self, name, eid):
@@ -18,7 +19,8 @@ class Player(DatabaseType):
         self.Height = self.add_field("string", storable=True)
         self.Weight = self.add_field("string", storable=True)
         self.URL = self.add_field("string", storable=True)
+        self.Headshot = self.add_field("string", storable=True)
 
 
 if __name__ == "__main__":
-    DatabaseFactory.getdb("mongodb").create(Player(None, None))
+    DatabaseFactory.getdb("odbc-sqlserver").create(Player(None, None))
