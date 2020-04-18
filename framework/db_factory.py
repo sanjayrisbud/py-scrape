@@ -2,12 +2,13 @@
 
 from .db_odbc_postgres import DatabaseInterfaceOdbcPostgres
 from .db_raw_mongodb import DatabaseInterfaceRawMongoDB
-
+from .db_odbc_sqlserver import DatabaseInterfaceOdbcSQLServer
 
 class DatabaseFactory:
 
     classdict = {
         "odbc-postgres": (DatabaseInterfaceOdbcPostgres, "dvd"),
+        "odbc-sqlserver": (DatabaseInterfaceOdbcSQLServer, "scrapes"),
         "mongodb": (
             DatabaseInterfaceRawMongoDB,
             "mongodb+srv://root:root@cluster0-pdn1x.mongodb.net/test?retryWrites=true&w=majority",
