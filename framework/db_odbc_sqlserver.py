@@ -15,6 +15,7 @@ class DatabaseInterfaceOdbcSQLServer(DatabaseInterfaceOdbc):
             .replace("<number>", "real")
             .replace("<datetime>", "datetime")
             .replace("<text>", "text")
+            .replace("pk_", f"{dbtype.__class__.__name__}_pk_")
         )
         print(sql)
         self.execute(sql)
