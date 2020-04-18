@@ -18,7 +18,7 @@ from .email_int import EmailInterface
 class Robot:
     _robotname = None
     _executionid = None
-    _database = DatabaseFactory.getdb("odbc-postgres")
+    _database = DatabaseFactory.getdb("odbc-sqlserver")
     _email = None
     logger = None
     GenericInput = None
