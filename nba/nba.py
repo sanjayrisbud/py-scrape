@@ -102,7 +102,7 @@ class TestRobot(RawRequests):
                 html = html.replace('href="/', 'href="https://www.nba.com/')
                 html = html.replace('class="lazyload" data-src="', 'src="https:')
 
-                filename = f'{url.split("/")[-1]}.html'
+                filename = f'{self.t.URL.split("/")[-1]}.html'
                 with open(f"{self.htmlpath}{filename}", "w") as f:
                     f.write(html)
                 self.scrape(html)
